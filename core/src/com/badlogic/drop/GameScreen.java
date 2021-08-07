@@ -97,7 +97,7 @@ public class GameScreen implements Screen {
     private void spawnRaindrop() {
 
         Raindrop raindrop = raindropPool.obtain();
-        raindrop.init(new Integer[]{100,150,200}[MathUtils.random(0, 2)] , bucket);
+        raindrop.init(new Integer[]{100, 150, 200}[MathUtils.random(0, 2)], bucket);
         activeRaindrop.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
     }
@@ -140,9 +140,8 @@ public class GameScreen implements Screen {
         mouseAndKeyboardControl();
 
         // check if we need to create a new raindrop
-        if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
-
         if (GameStatus.RUN == game.State) {
+            if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
             moveRaindrops();
         }
     }
