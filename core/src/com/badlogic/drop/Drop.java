@@ -23,6 +23,8 @@ public class Drop extends Game {
     public BitmapFont font;
 
     public int dropsGathered;
+    public int finalFreeRaindrop;
+    public int finalActiveRaindrop;
 
     @Override
     public void create() {
@@ -40,5 +42,11 @@ public class Drop extends Game {
     public void dispose() {
         batch.dispose();
         font.dispose();
+    }
+
+    public static void debug(String message) {
+        if (Drop.DEBUG) {
+            System.out.println(message);
+        }
     }
 }

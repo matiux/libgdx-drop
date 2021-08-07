@@ -15,31 +15,40 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-
-import java.util.Iterator;
 
 public class GameScreen implements Screen {
 
     final Drop game;
-    private Texture dropImage;
-    private Texture bucketImage;
+    private final Texture dropImage;
+    private final Texture bucketImage;
 
-    private TextureAtlas playPauseSprite;
-    private Sprite pauseButton;
-    private Sprite playButton;
+    private final TextureAtlas playPauseSprite;
+    private final Sprite pauseButton;
+    private final Sprite playButton;
     private Sprite controlButton;
 
-    private Sound dropSound;
-    private Music rainMusic;
+    private final Sound dropSound;
+    private final Music rainMusic;
 
-    private OrthographicCamera camera;
+    private final OrthographicCamera camera;
 
-    private ShapeRenderer shapeRenderer;
+    private final ShapeRenderer shapeRenderer;
     private Rectangle bucket;
 
-    private Array<Rectangle> raindrops;
+    //private Array<Rectangle> raindrops;
+
+    // array containing the active bullets.
+    private final Array<Raindrop> activeRaindrop = new Array<>();
+    private final Pool<Raindrop> raindropPool = new Pool<Raindrop>() {
+        @Override
+        protected Raindrop newObject() {
+            return new Raindrop();
+        }
+    };
+
     private long lastDropTime;
 
     public GameScreen(final Drop game) {
@@ -72,7 +81,6 @@ public class GameScreen implements Screen {
         createBucket();
 
         // create the raindrops array and spawn the first raindrop
-        raindrops = new Array<Rectangle>();
         spawnRaindrop();
     }
 
@@ -88,14 +96,9 @@ public class GameScreen implements Screen {
 
     private void spawnRaindrop() {
 
-        int raindropSize = MathUtils.random(16, 64);
-
-        Rectangle raindrop = new Rectangle();
-        raindrop.x = MathUtils.random(0, Drop.GAME_WIDTH - raindropSize);
-        raindrop.y = Drop.GAME_HEIGHT;
-        raindrop.width = raindropSize;
-        raindrop.height = raindropSize;
-        raindrops.add(raindrop);
+        Raindrop raindrop = raindropPool.obtain();
+        raindrop.init(new Integer[]{100,150,200}[MathUtils.random(0, 2)] , bucket);
+        activeRaindrop.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
     }
 
@@ -124,9 +127,11 @@ public class GameScreen implements Screen {
         // begin a new batch and draw the bucket and all drops
         game.batch.begin();
         game.font.draw(game.batch, "Drops Collected: " + game.dropsGathered, 20, Drop.GAME_HEIGHT - 10);
+        game.font.draw(game.batch, String.format("Free raindrops: %d - Active raindrops: %d", raindropPool.getFree(), activeRaindrop.size), 20, Drop.GAME_HEIGHT - 40);
+
         controlButton.draw(game.batch);
         game.batch.draw(bucketImage, bucket.x, bucket.y);
-        for (Rectangle raindrop : raindrops) {
+        for (Raindrop raindrop : activeRaindrop) {
             game.batch.draw(dropImage, raindrop.x, raindrop.y, raindrop.getWidth(), raindrop.getHeight());
         }
         game.batch.end();
@@ -145,7 +150,7 @@ public class GameScreen implements Screen {
     private void drawDebugRectangle() {
         if (Drop.DEBUG) {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            for (Rectangle raindrop : raindrops) {
+            for (Raindrop raindrop : activeRaindrop) {
                 shapeRenderer.rect(raindrop.getX(), raindrop.getY(), raindrop.getWidth(), raindrop.getHeight());
             }
             shapeRenderer.end();
@@ -177,22 +182,21 @@ public class GameScreen implements Screen {
         // move the raindrops, remove any that are beneath the bottom edge of
         // the screen or that hit the bucket. In the latter case we play back
         // a sound effect as well.
-        for (Iterator<Rectangle> iter = raindrops.iterator(); iter.hasNext(); ) {
-            Rectangle raindrop = iter.next();
-            raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
+        int len = activeRaindrop.size;
+        for (int i = len; --i >= 0; ) {
+            Raindrop raindrop = activeRaindrop.get(i);
+            raindrop.update(Gdx.graphics.getDeltaTime());
 
-            if (raindrop.y + raindrop.height < 0) {
-                iter.remove();
-                debug("Rimossa raindrop dalla collezione");
-            }
-
-            if (raindrop.overlaps(bucket)) {
+            if (!raindrop.alive) {
                 game.dropsGathered++;
                 dropSound.play();
-                iter.remove();
+                activeRaindrop.removeIndex(i);
+                raindropPool.free(raindrop);
             }
 
-            if (0 > raindrop.y) {
+            if (raindrop.y + raindrop.height < 0) {
+                game.finalFreeRaindrop = raindropPool.getFree();
+                game.finalActiveRaindrop = activeRaindrop.size;
                 game.setScreen(new MainMenuScreen(game));
                 dispose();
             }
@@ -201,13 +205,13 @@ public class GameScreen implements Screen {
 
     private void checkIfControlButtonIsTouched(Vector3 touchPos) {
 
-        debug(String.format("Control button X: %f - Max X: %f - Y: %f - Max Y: %f", controlButton.getX(), controlButton.getX() + controlButton.getWidth(), controlButton.getY(), controlButton.getY() + controlButton.getHeight()));
-        debug(String.format("Touch pos X: %f - Y: %f", touchPos.x, touchPos.y));
+        Drop.debug(String.format("Control button X: %f - Max X: %f - Y: %f - Max Y: %f", controlButton.getX(), controlButton.getX() + controlButton.getWidth(), controlButton.getY(), controlButton.getY() + controlButton.getHeight()));
+        Drop.debug(String.format("Touch pos X: %f - Y: %f", touchPos.x, touchPos.y));
 
         if (touchPos.x > controlButton.getX() && touchPos.x < controlButton.getX() + controlButton.getWidth()) {
 
             if (touchPos.y > controlButton.getY() && touchPos.y < controlButton.getY() + controlButton.getHeight()) {
-                debug(String.format("Control button touched. Status %s", this.game.State));
+                Drop.debug(String.format("Control button touched. Status %s", this.game.State));
 
                 switch (this.game.State) {
                     case RUN:
@@ -218,12 +222,6 @@ public class GameScreen implements Screen {
                         break;
                 }
             }
-        }
-    }
-
-    private void debug(String message) {
-        if (Drop.DEBUG) {
-            System.out.println(message);
         }
     }
 

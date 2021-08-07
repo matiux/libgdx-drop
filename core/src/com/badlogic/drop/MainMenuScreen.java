@@ -30,10 +30,12 @@ public class MainMenuScreen implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
-        game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
+        game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 250);
+        game.font.draw(game.batch, "Tap anywhere to begin!", 100, 200);
         if(0 < game.dropsGathered) {
-            game.font.draw(game.batch, "Last score: " + game.dropsGathered, 100, 50);
+            game.font.draw(game.batch, "Last score: " + game.dropsGathered, 100, 150);
+            game.font.draw(game.batch, "Free raindrops: " + game.finalFreeRaindrop, 100, 100);
+            game.font.draw(game.batch, "Active raindrops: " + game.finalActiveRaindrop, 100, 50);
         }
         game.batch.end();
 
