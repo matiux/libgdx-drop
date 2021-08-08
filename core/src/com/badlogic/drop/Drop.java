@@ -1,6 +1,7 @@
 package com.badlogic.drop;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -25,6 +26,7 @@ public class Drop extends Game {
     public int dropsGathered;
     public int finalFreeRaindrop;
     public int finalActiveRaindrop;
+    public OrthographicCamera camera;
 
     @Override
     public void create() {
@@ -32,6 +34,10 @@ public class Drop extends Game {
         batch = new SpriteBatch();
         font = new BitmapFont(); // use libGDX's default Arial font
         font.getData().setScale(1.5f, 1.5f);
+
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, Drop.GAME_WIDTH, Drop.GAME_HEIGHT);
+
         this.setScreen(new MainMenuScreen(this));
     }
 

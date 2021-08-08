@@ -6,7 +6,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -32,8 +31,6 @@ public class GameScreen implements Screen {
 
     private final Sound dropSound;
     private final Music rainMusic;
-
-    private final OrthographicCamera camera;
 
     private final ShapeRenderer shapeRenderer;
     private Rectangle bucket;
@@ -70,10 +67,6 @@ public class GameScreen implements Screen {
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
         rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
         rainMusic.setLooping(true);
-
-        // create the camera and the SpriteBatch
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Drop.GAME_WIDTH, Drop.GAME_HEIGHT);
 
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setColor(Color.RED);
@@ -119,10 +112,10 @@ public class GameScreen implements Screen {
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
         // tell the camera to update its matrices.
-        camera.update();
+        this.game.camera.update();
 
         // tell the SpriteBatch to render in the coordinate system specified by the camera.
-        game.batch.setProjectionMatrix(camera.combined);
+        game.batch.setProjectionMatrix(this.game.camera.combined);
 
         // begin a new batch and draw the bucket and all drops
         game.batch.begin();
@@ -163,7 +156,11 @@ public class GameScreen implements Screen {
 
             Vector3 touchPos = new Vector3();
             touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(touchPos);
+
+            // Gdx.input.getX() and Gdx.input.getY() return the current touch/mouse position.
+            // To transform these coordinates to our camera’s coordinate system,
+            // we need to call the camera.unproject() method
+            this.game.camera.unproject(touchPos);
             checkIfControlButtonIsTouched(touchPos);
 
             bucket.x = touchPos.x - 64 / 2;

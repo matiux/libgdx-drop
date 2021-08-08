@@ -8,13 +8,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class MainMenuScreen implements Screen {
 
     final Drop game;
-    OrthographicCamera camera;
 
     public MainMenuScreen(final Drop game) {
         this.game = game;
-
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Drop.GAME_WIDTH, Drop.GAME_HEIGHT);
     }
 
     @Override
@@ -26,8 +22,8 @@ public class MainMenuScreen implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
-        camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
+        this.game.camera.update();
+        game.batch.setProjectionMatrix(this.game.camera.combined);
 
         game.batch.begin();
         game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 250);
