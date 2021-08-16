@@ -27,16 +27,9 @@ public class GameScreen implements Screen {
     private final TextureAtlas playPauseSprite;
     private final Sprite pauseButton;
     private final Sprite playButton;
-    private Sprite controlButton;
-
     private final Sound dropSound;
     private final Music rainMusic;
-
     private final ShapeRenderer shapeRenderer;
-    private Rectangle bucket;
-
-    //private Array<Rectangle> raindrops;
-
     // array containing the active bullets.
     private final Array<Raindrop> activeRaindrop = new Array<>();
     private final Pool<Raindrop> raindropPool = new Pool<Raindrop>() {
@@ -46,6 +39,9 @@ public class GameScreen implements Screen {
         }
     };
 
+    //private Array<Rectangle> raindrops;
+    private Sprite controlButton;
+    private Rectangle bucket;
     private long lastDropTime;
 
     public GameScreen(final Drop game) {
@@ -101,6 +97,7 @@ public class GameScreen implements Screen {
     public void show() {
         // start the playback of the background music
         // when the screen is shown
+        this.game.hud.initCounters();
         rainMusic.play();
     }
 
@@ -119,10 +116,13 @@ public class GameScreen implements Screen {
         // tell the SpriteBatch to render in the coordinate system specified by the camera.
         game.batch.setProjectionMatrix(this.game.camera.combined);
 
+        this.game.hud.stage.draw();
+
         // begin a new batch and draw the bucket and all drops
         game.batch.begin();
-        game.font.draw(game.batch, "Drops Collected: " + game.dropsGathered, 20, Drop.GAME_HEIGHT - 10);
-        game.font.draw(game.batch, String.format("Free raindrops: %d - Active raindrops: %d", raindropPool.getFree(), activeRaindrop.size), 20, Drop.GAME_HEIGHT - 40);
+
+        game.hud.setFreeRaindrops(raindropPool.getFree());
+        game.hud.setActiveRaindrops(activeRaindrop.size);
 
         controlButton.draw(game.batch);
         game.batch.draw(bucketImage, bucket.x, bucket.y);
@@ -188,15 +188,16 @@ public class GameScreen implements Screen {
             raindrop.update(Gdx.graphics.getDeltaTime());
 
             if (!raindrop.alive) {
-                game.dropsGathered++;
+                game.hud.incrementScore();
                 dropSound.play();
                 activeRaindrop.removeIndex(i);
                 raindropPool.free(raindrop);
             }
 
             if (raindrop.y + raindrop.height < 0) {
-                game.finalFreeRaindrop = raindropPool.getFree();
-                game.finalActiveRaindrop = activeRaindrop.size;
+                game.hud.setFreeRaindrops(raindropPool.getFree());
+                game.hud.setActiveRaindrops(activeRaindrop.size);
+
                 game.setScreen(new MainMenuScreen(game));
                 dispose();
             }

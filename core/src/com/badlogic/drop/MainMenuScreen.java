@@ -2,12 +2,12 @@ package com.badlogic.drop;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class MainMenuScreen implements Screen {
 
     final Drop game;
+
 
     public MainMenuScreen(final Drop game) {
         this.game = game;
@@ -28,18 +28,16 @@ public class MainMenuScreen implements Screen {
         game.batch.begin();
         game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 250);
         game.font.draw(game.batch, "Tap anywhere to begin!", 100, 200);
-        if(0 < game.dropsGathered) {
-            game.font.draw(game.batch, "Last score: " + game.dropsGathered, 100, 150);
-            game.font.draw(game.batch, "Free raindrops: " + game.finalFreeRaindrop, 100, 100);
-            game.font.draw(game.batch, "Active raindrops: " + game.finalActiveRaindrop, 100, 50);
-        }
+
         game.batch.end();
 
         if (Gdx.input.isTouched()) {
             game.setScreen(new GameScreen(game));
-            game.dropsGathered = 0;
             dispose();
         }
+
+        //this.game.batch.setProjectionMatrix(this.game.hud.stage.getCamera().combined); // ??
+        this.game.hud.stage.draw();
     }
 
     @Override
