@@ -14,8 +14,8 @@ public class Drop extends Game {
 
     public GameStatus State = GameStatus.RUN;
     public static final boolean DEBUG = true;
-    public static final int GAME_WIDTH = 1024;
-    public static final int GAME_HEIGHT = 768;
+    public static final int GAME_WIDTH = 1920;
+    public static final int GAME_HEIGHT = 1080;
 
     // The SpriteBatch object is used to render objects onto the screen, such as textures.
     public SpriteBatch batch;

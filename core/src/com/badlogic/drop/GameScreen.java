@@ -70,6 +70,8 @@ public class GameScreen implements Screen {
 
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setColor(Color.RED);
+        shapeRenderer.setProjectionMatrix(game.batch.getProjectionMatrix());
+        shapeRenderer.setTransformMatrix(game.batch.getTransformMatrix());
 
         createBucket();
 
@@ -134,7 +136,9 @@ public class GameScreen implements Screen {
 
         // check if we need to create a new raindrop
         if (GameStatus.RUN == game.State) {
-            if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
+            if (TimeUtils.nanoTime() - lastDropTime > 1000000000) {
+                spawnRaindrop();
+            }
             moveRaindrops();
         }
     }
