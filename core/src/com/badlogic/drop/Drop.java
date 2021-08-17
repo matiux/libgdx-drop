@@ -17,15 +17,14 @@ public class Drop extends Game {
     public static final int GAME_WIDTH = 1920;
     public static final int GAME_HEIGHT = 1080;
 
+    public HUD hud;
+
     // The SpriteBatch object is used to render objects onto the screen, such as textures.
     public SpriteBatch batch;
 
     // The BitmapFont object is used, along with a SpriteBatch, to render text onto the screen.
     public BitmapFont font;
 
-    public int dropsGathered;
-    public int finalFreeRaindrop;
-    public int finalActiveRaindrop;
     public OrthographicCamera camera;
 
     @Override
@@ -39,6 +38,8 @@ public class Drop extends Game {
         camera.setToOrtho(false, Drop.GAME_WIDTH, Drop.GAME_HEIGHT);
 
         this.setScreen(new MainMenuScreen(this));
+
+        hud = new HUD(batch);
     }
 
     public void render() {
@@ -48,6 +49,7 @@ public class Drop extends Game {
     public void dispose() {
         batch.dispose();
         font.dispose();
+        hud.dispose();
     }
 
     public static void debug(String message) {
