@@ -1,5 +1,5 @@
 sprites.png
-size: 872, 436
+size: 1308, 436
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
@@ -13,6 +13,13 @@ pause
 play
   rotate: false
   xy: 436, 0
+  size: 436, 436
+  orig: 436, 436
+  offset: 0, 0
+  index: -1
+close
+  rotate: false
+  xy: 872, 0
   size: 436, 436
   orig: 436, 436
   offset: 0, 0

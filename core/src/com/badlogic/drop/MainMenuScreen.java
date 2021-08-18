@@ -3,6 +3,7 @@ package com.badlogic.drop;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainMenuScreen implements Screen {
 
@@ -42,7 +43,7 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        this.game.hud.stage.getViewport().update(width, height, true);
     }
 
     @Override

@@ -12,11 +12,10 @@ enum GameStatus {
 
 public class Drop extends Game {
 
-    public GameStatus State = GameStatus.RUN;
     public static final boolean DEBUG = true;
-    public static final int GAME_WIDTH = 1920;
+    public static final int GAME_WIDTH = 1400;
     public static final int GAME_HEIGHT = 1080;
-
+    public GameStatus State = GameStatus.RUN;
     public HUD hud;
 
     // The SpriteBatch object is used to render objects onto the screen, such as textures.
@@ -26,6 +25,12 @@ public class Drop extends Game {
     public BitmapFont font;
 
     public OrthographicCamera camera;
+
+    public static void debug(String message) {
+        if (Drop.DEBUG) {
+            System.out.println(message);
+        }
+    }
 
     @Override
     public void create() {
@@ -37,9 +42,9 @@ public class Drop extends Game {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Drop.GAME_WIDTH, Drop.GAME_HEIGHT);
 
-        this.setScreen(new MainMenuScreen(this));
-
         hud = new HUD(batch);
+
+        this.setScreen(new MainMenuScreen(this));
     }
 
     public void render() {
@@ -50,11 +55,5 @@ public class Drop extends Game {
         batch.dispose();
         font.dispose();
         hud.dispose();
-    }
-
-    public static void debug(String message) {
-        if (Drop.DEBUG) {
-            System.out.println(message);
-        }
     }
 }

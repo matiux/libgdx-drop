@@ -54,9 +54,9 @@ public class GameScreen implements Screen {
 
         playPauseSprite = new TextureAtlas("sprites.txt");
         pauseButton = playPauseSprite.createSprite("pause");
-        pauseButton.setBounds(Drop.GAME_WIDTH - 60, Drop.GAME_HEIGHT - 60, 50, 50);
+        pauseButton.setBounds(Drop.GAME_WIDTH - 130, Drop.GAME_HEIGHT - 60, 50, 50);
         playButton = playPauseSprite.createSprite("play");
-        playButton.setBounds(Drop.GAME_WIDTH - 60, Drop.GAME_HEIGHT - 60, 50, 50);
+        playButton.setBounds(Drop.GAME_WIDTH - 130, Drop.GAME_HEIGHT - 60, 50, 50);
         controlButton = pauseButton;
 
         // load the drop sound effect and the rain background "music"
@@ -116,6 +116,7 @@ public class GameScreen implements Screen {
         // tell the SpriteBatch to render in the coordinate system specified by the camera.
         game.batch.setProjectionMatrix(this.game.camera.combined);
 
+        //this.game.batch.setProjectionMatrix(this.game.hud.stage.getCamera().combined);
         this.game.hud.stage.draw();
 
         // begin a new batch and draw the bucket and all drops
@@ -228,7 +229,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        this.game.hud.stage.getViewport().update(width, height, true);
     }
 
     @Override
